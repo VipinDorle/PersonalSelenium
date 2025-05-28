@@ -1,19 +1,42 @@
-package LoginFunctionality;
+var desktop = automation.GetDesktop();
+var allLists = desktop.FindAllDescendants(cf => cf.ByControlType(ControlType.List)
+                                                  .And(cf.ByFrameworkId("WinForm")));
 
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
+AutomationElement correctList = null;
 
-public class AutoLogin {
-	static WebDriver driver = new ChromeDriver();
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		driver.manage().window().maximize();
-		driver.get("http://demo.seleniumeasy.com/basic-first-form-demo.html");
-		
-		LoginPersonal();
-		
-	}
-	static void LoginPersonal(){
-		
-	}
+foreach (var list in allLists)
+{
+    if (!list.IsOffscreen)
+    {
+        var items = list.FindAllChildren();
+        if (items.Length > 0)
+        {
+            Console.WriteLine("Visible list found with items:");
+            foreach (var item in items)
+            {
+                Console.WriteLine($"  Item: {item.Name}");
+            }
+
+            correctList = list;
+            break;
+        }
+    }
+}
+
+if (correctList != null)
+{
+    var targetItem = correctList.FindFirstChild(cf => cf.ByName("India"));
+    if (targetItem != null)
+    {
+        targetItem.Click();
+        Console.WriteLine("Item 'India' selected.");
+    }
+    else
+    {
+        Console.WriteLine("'India' not found in dropdown.");
+    }
+}
+else
+{
+    Console.WriteLine("No visible list with items was found.");
 }
